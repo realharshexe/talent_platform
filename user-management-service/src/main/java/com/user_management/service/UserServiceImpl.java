@@ -21,7 +21,10 @@ public class UserServiceImpl implements UserService {
     private UserDao dao;
     @Autowired
     private ProfileDao profileDao;
+    @Autowired
     private final BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private final JwtService jwtService;
 
 
     @Override
@@ -33,13 +36,16 @@ public class UserServiceImpl implements UserService {
         dao.save(users);
     }
 
-    @Override
     public String authenticateUser(UserDto userDTO) {
-        Optional<Users> u = dao.findByEmail(userDTO.getEmail());
-        if (u.isPresent() && passwordEncoder.matches(userDTO.getPassword(), u.get().getPassword())) {
-            return "Authentication successful";
+        Users users = dao.findByEmail(userDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(userDTO.getPassword(), users.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
-        return "Invalid email or password";
+
+        // Generate JWT Token
+        return jwtService.generateToken(users.getEmail());
     }
 
     @Override

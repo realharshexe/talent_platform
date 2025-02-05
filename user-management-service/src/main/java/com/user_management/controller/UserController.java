@@ -4,6 +4,7 @@ import com.user_management.model.UserDto;
 import com.user_management.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -30,9 +31,32 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserDto userDTO) {
-        userService.registerUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserDto userDTO) {
+        try {
+            userService.registerUser(userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        } catch (IllegalArgumentException e) {
+            logger.error("Registration failed for user with email: {}", userDTO.getEmail(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("incorrect email");
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred during registration " +
+                    "for user with email: {}", userDTO.getEmail(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred");
+        }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody UserDto userDTO) {
+        try {
+            String token = userService.authenticateUser(userDTO);
+            logger.info("User logged in successfully: {}", userDTO.getEmail());
+            return ResponseEntity.ok().body(token); // Returning token instead of plain string
+        } catch (Exception e) {
+            logger.error("Login failed for email {}: {}", userDTO.getEmail(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+
+    }
 }
