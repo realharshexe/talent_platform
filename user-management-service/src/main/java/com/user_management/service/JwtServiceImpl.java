@@ -27,19 +27,16 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    // Validate Token
     @Override
     public boolean validateToken(String token, String email) {
         return email.equals(extractUsername(token)) && !isTokenExpired(token);
     }
 
-    // Extract Username (Email) from Token
     @Override
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Check if Token is Expired
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }

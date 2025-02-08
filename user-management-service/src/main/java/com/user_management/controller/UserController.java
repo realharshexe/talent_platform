@@ -1,5 +1,6 @@
 package com.user_management.controller;
 
+import com.user_management.model.ProfileDto;
 import com.user_management.model.UserDto;
 import com.user_management.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -47,17 +45,50 @@ public class UserController {
                     .body("An unexpected error occurred");
         }
     }
-
+    @Operation(summary = "login as a existing user", description = "If user email already exists,he can login")
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserDto userDTO) {
         try {
             String token = userService.authenticateUser(userDTO);
             logger.info("User logged in successfully: {}", userDTO.getEmail());
-            return ResponseEntity.ok().body(token); // Returning token instead of plain string
+            return ResponseEntity.ok().body(token);
         } catch (Exception e) {
             logger.error("Login failed for email {}: {}", userDTO.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 
+    }
+    @Operation(summary = "Get user profile", description = "Fetches user profile details by user ID")
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<?> getProfile(@PathVariable Long id) {
+        try {
+            ProfileDto profile = userService.getProfile(id);
+            if (profile == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User profile not found");
+            }
+            logger.info("Fetched profile for user ID: {}", id);
+            return ResponseEntity.ok(profile);
+        } catch (Exception e) {
+            logger.error("Error fetching profile for user ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching profile");
+        }
+    }
+
+    @Operation(summary = "Update user profile", description = "Updates user profile details by user ID")
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<String> updateProfile(@PathVariable Long id, @Valid @RequestBody ProfileDto profileDTO) {
+        try {
+            userService.updateProfile(id, profileDTO);
+            logger.info("Profile updated successfully for user ID: {}", id);
+            return ResponseEntity.ok("Profile updated successfully");
+        } catch (IllegalArgumentException e) {
+            logger.warn("Profile update failed for user ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid profile data");
+        } catch (Exception e) {
+            logger.error("Unexpected error during profile update for user ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred while updating profile");
+        }
     }
 }

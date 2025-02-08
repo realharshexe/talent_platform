@@ -1,13 +1,13 @@
 package com.user_management.service;
 
 import com.user_management.dao.ProfileDao;
+import com.user_management.dao.RoleDao;
 import com.user_management.dao.UserDao;
-import com.user_management.model.UserRoleEnum;
+import com.user_management.entity.Role;
 import com.user_management.entity.Profiles;
 import com.user_management.entity.Users;
 import com.user_management.model.ProfileDto;
 import com.user_management.model.UserDto;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +22,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ProfileDao profileDao;
     @Autowired
+    private RoleDao roleDao;
+    @Autowired
     private final BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private final JwtService jwtService;
@@ -32,9 +34,15 @@ public class UserServiceImpl implements UserService {
         Users users = Users.builder()
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
-                .role(UserRoleEnum.valueOf(userDto.getRole())).build();
-        dao.save(users);
+                .build();
+        users = dao.save(users);
+
+        Role role = new Role();
+        role.setUsers(users);
+        role.setRoles(userDto.getRoles()); // Directly assign the RoleEnum
+        roleDao.save(role);
     }
+
 
     public String authenticateUser(UserDto userDTO) {
         Users users = dao.findByEmail(userDTO.getEmail())
