@@ -20,15 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
 @Slf4j
 @Validated
 @Tag(name = "User Management", description = "APIs for managing users and profiles")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
+
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserDto userDTO) {
