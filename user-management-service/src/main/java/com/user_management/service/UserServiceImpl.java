@@ -3,15 +3,15 @@ package com.user_management.service;
 import com.user_management.dao.ProfileDao;
 import com.user_management.dao.UserDao;
 import com.user_management.model.UserRoleEnum;
-import com.user_management.entity.Profile;
+import com.user_management.entity.Profiles;
 import com.user_management.entity.Users;
 import com.user_management.model.ProfileDto;
 import com.user_management.model.UserDto;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,27 +50,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ProfileDto getProfile(Long profileId) {
-        Profile profile = profileDao.findById(profileId)
+        Profiles profiles = profileDao.findById(profileId)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
         return ProfileDto.builder()
-                .id(profile.getId())
-                .bio(profile.getBio())
-                .skills(profile.getSkills())
-                .location(profile.getLocation())
-                .experience(profile.getExperience())
-                .languages(profile.getLanguages())
+                .id(profiles.getId())
+                .bio(profiles.getBio())
+                .skills(profiles.getSkills())
+                .location(profiles.getLocation())
+                .experience(profiles.getExperience())
+                .languages(profiles.getLanguages())
                 .build();
     }
 
     @Override
     public void updateProfile(Long profileId, ProfileDto profileDTO) {
-        Profile profile = profileDao.findById(profileId)
+        Profiles profiles = profileDao.findById(profileId)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-        profile.setBio(profileDTO.getBio());
-        profile.setSkills(profileDTO.getSkills());
-        profile.setLocation(profileDTO.getLocation());
-        profile.setExperience(profileDTO.getExperience());
-        profile.setLanguages(profileDTO.getLanguages());
-        profileDao.save(profile);
+        profiles.setBio(profileDTO.getBio());
+        profiles.setSkills(profileDTO.getSkills());
+        profiles.setLocation(profileDTO.getLocation());
+        profiles.setExperience(profileDTO.getExperience());
+        profiles.setLanguages(profileDTO.getLanguages());
+        profileDao.save(profiles);
     }
 }

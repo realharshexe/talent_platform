@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Profile {
+public class Profiles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -21,8 +20,7 @@ public class Profile {
     private String location;
     private String languages;
     private Integer experience;
-    @ManyToOne
-    @JoinColumn(name = "users_id", nullable = false)
+    @OneToOne(mappedBy = "profiles")
     private Users user;
 
 }
