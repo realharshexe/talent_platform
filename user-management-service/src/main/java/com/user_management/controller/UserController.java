@@ -29,6 +29,7 @@ public class UserController {
     @Autowired
     private final UserService userService;
 
+    @Operation(summary = "Register as a new user", description = "creating an account based on email")
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserDto userDTO) {
         try {

@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
         Role role = new Role();
         role.setUsers(users);
-        role.setRoles(userDto.getRoles()); // Directly assign the RoleEnum
+        role.setRoles(userDto.getRoles());
         roleDao.save(role);
     }
 
