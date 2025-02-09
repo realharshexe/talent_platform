@@ -31,19 +31,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(UserDto userDto) {
-        // 1️⃣ Check if user already exists
+        // Check if user already exists
         if (dao.existsByEmail(userDto.getEmail())) {
             throw new RuntimeException("Email already in use");
         }
-
-        // 2️⃣ Fetch role_id from role table
+        //  Fetch role_id from role table
         Role role = roleDao.findByRoles(userDto.getRoles())
                 .orElseThrow(() -> new RuntimeException("Invalid role: " + userDto.getRoles()));
-
-        // 3️⃣ Hash password
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
 
-        // 4️⃣ Save user with role_id
         Users user = new Users();
         user.setEmail(userDto.getEmail());
         user.setPassword(encodedPassword);
