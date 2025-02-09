@@ -48,11 +48,11 @@ public class UserController {
     }
     @Operation(summary = "login as a existing user", description = "If user email already exists,he can login")
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody UserDto userDTO) {
+    public ResponseEntity<String> loginUser(@Valid @RequestBody UserDto userDTO) {
         try {
             String token = userService.authenticateUser(userDTO);
             logger.info("User logged in successfully: {}", userDTO.getEmail());
-            return ResponseEntity.ok().body(token);
+            return ResponseEntity.ok().body(token + "You've logged in successfully");
         } catch (Exception e) {
             logger.error("Login failed for email {}: {}", userDTO.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

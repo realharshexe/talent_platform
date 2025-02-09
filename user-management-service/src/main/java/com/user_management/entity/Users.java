@@ -29,9 +29,9 @@ public class Users {
     @JoinColumn(name = "profile_id", unique = true)
     private Profiles profiles;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "role_id", unique = true)
-    private Role roles;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     @Column(nullable = false)
     private LocalDateTime updatedOn = LocalDateTime.now();
