@@ -39,4 +39,10 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    @PrePersist
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedOn = LocalDateTime.now();
+    }
+
 }
